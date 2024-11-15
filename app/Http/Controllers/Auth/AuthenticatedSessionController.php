@@ -8,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -31,11 +32,13 @@ class AuthenticatedSessionController extends Controller
     
             $request->session()->regenerate();
     
-            return redirect()->route('dashboard');
+            return redirect()->route('home.index');
         } catch (ValidationException $e) {
-            return back()->withErrors([
-                'username' => __('The provided credentials do not match our records.'),
-            ])->onlyInput('username');
+            Log::error(['error' => $e->getMessage()]);
+            return back()->with([
+                'status' => 'error',
+                'message' => "Login is Not Successfully. Please try again."
+            ]);
         }
     }
 
