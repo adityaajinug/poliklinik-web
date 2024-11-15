@@ -4,62 +4,108 @@ namespace App\Http\Controllers;
 
 use App\Models\Pasien;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PasienController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return view('pasien.index', [
+            'data' => Pasien::all(),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('pasien.form', [
+            'action' => 'store',
+            'data' => null,
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        try {
+            $validatedData = $request->validate([
+                'nama' => 'required|string|max:255',
+                'alamat' => 'required|string|max:500',
+                'no_hp' => 'required|string|max:15',
+            ]);
+
+            Pasien::create($validatedData);
+
+            return redirect()->route('pasien.index')->with([
+                'status' => 'success',
+                'message' => 'Pasien berhasil ditambahkan!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error(['error' => $e->getMessage()]);
+
+            return redirect()->back()->with([
+                'status' => 'error',
+                'message' => 'Gagal menambahkan pasien! Silakan coba lagi.'
+            ]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Pasien $pasien)
+    public function edit($id)
     {
-        //
+        $pasien = Pasien::findOrFail($id);
+
+        return view('pasien.form', [
+            'action' => 'update',
+            'data' => $pasien,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Pasien $pasien)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $pasien = Pasien::findOrFail($id);
+
+            $validatedData = $request->validate([
+                'nama' => 'required|string|max:255',
+                'alamat' => 'required|string|max:500',
+                'no_hp' => 'required|string|max:15',
+            ]);
+
+            $pasien->update($validatedData);
+
+            return redirect()->route('pasien.index')->with([
+                'status' => 'success',
+                'message' => 'Pasien berhasil diperbarui!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error(['error' => $e->getMessage()]);
+
+            return redirect()->back()->with([
+                'status' => 'error',
+                'message' => 'Gagal memperbarui pasien! Silakan coba lagi.'
+            ]);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Pasien $pasien)
+    public function destroy($id)
     {
-        //
-    }
+        try {
+            $pasien = Pasien::findOrFail($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Pasien $pasien)
-    {
-        //
+            $pasien->delete();
+
+            return redirect()->route('pasien.index')->with([
+                'status' => 'success',
+                'message' => 'Pasien berhasil dihapus!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error(['error' => $e->getMessage()]);
+
+            return redirect()->route('pasien.index')->with([
+                'status' => 'error',
+                'message' => 'Gagal menghapus pasien! Silakan coba lagi.'
+            ]);
+        }
     }
 }
