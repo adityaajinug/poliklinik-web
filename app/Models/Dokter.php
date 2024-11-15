@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Dokter extends Model
 {
     use HasFactory;
-    protected $timestamps = false;
+    public $timestamps = false;
     protected $fillable = [
         'nama', 'alamat', 'no_hp'
     ];
