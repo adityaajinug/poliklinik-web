@@ -3,63 +3,134 @@
 namespace App\Http\Controllers;
 
 use App\Models\Periksa;
+use App\Models\Pasien;
+use App\Models\Dokter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PeriksaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return view('periksa.index', [
+            'data' => Periksa::all(),
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $pasiens = Pasien::all();
+        $dokters = Dokter::all();
+
+        return view('periksa.form', [
+            'pasiens' => $pasiens,
+            'dokters' => $dokters,
+            'action' => 'store'
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        try {
+            $validated = $request->validate([
+                'id_pasien' => 'required|exists:pasiens,id',
+                'id_dokter' => 'required|exists:dokters,id',
+                'tgl_periksa' => 'required',
+                'catatan' => 'nullable|string',
+                'obat' => 'nullable|string',
+            ]);
+
+            Periksa::create([
+                'id_pasien' => $validated['id_pasien'],
+                'id_dokter' => $validated['id_dokter'],
+                'tgl_periksa' => $validated['tgl_periksa'],
+                'catatan' => $validated['catatan'],
+                'obat' => $validated['obat'],
+            ]);
+
+            return redirect()->route('periksa.index')->with([
+                'status' => 'success',
+                'message' => 'Periksa berhasil ditambahkan!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error(['error' => $e->getMessage()]);
+
+            return redirect()->back()->with([
+                'status' => 'error',
+                'message' => 'Gagal menambahkan Periksa! Silakan coba lagi.'
+            ]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Periksa $periksa)
+    public function edit($id)
     {
-        //
+        $periksa = Periksa::findOrFail($id);
+        $pasiens = Pasien::all();
+        $dokters = Dokter::all();
+
+        return view('periksa.form', [
+            'periksa' => $periksa,
+            'pasiens' => $pasiens,
+            'dokters' => $dokters,
+            'action' => 'update'
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Periksa $periksa)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $periksa = Periksa::findOrFail($id);
+
+            $validated = $request->validate([
+                'id_pasien' => 'required|exists:pasiens,id',
+                'id_dokter' => 'required|exists:dokters,id',
+                'tgl_periksa' => 'required|date',
+                'catatan' => 'nullable|string',
+                'obat' => 'nullable|string',
+            ]);
+
+            $periksa->update([
+                'id_pasien' => $validated['id_pasien'],
+                'id_dokter' => $validated['id_dokter'],
+                'tgl_periksa' => $validated['tgl_periksa'],
+                'catatan' => $validated['catatan'],
+                'obat' => $validated['obat'],
+            ]);
+
+            return redirect()->route('periksa.index')->with([
+                'status' => 'success',
+                'message' => 'Periksa berhasil diperbarui!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error(['error' => $e->getMessage()]);
+
+            return redirect()->back()->with([
+                'status' => 'error',
+                'message' => 'Gagal memperbarui Periksa! Silakan coba lagi.'
+            ]);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Periksa $periksa)
+    public function destroy($id)
     {
-        //
-    }
+        try {
+            $periksa = Periksa::findOrFail($id);
+            $periksa->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Periksa $periksa)
-    {
-        //
+            return redirect()->route('periksa.index')->with([
+                'status' => 'success',
+                'message' => 'Periksa berhasil dihapus!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error(['error' => $e->getMessage()]);
+
+            return redirect()->route('periksa.index')->with([
+                'status' => 'error',
+                'message' => 'Gagal menghapus Periksa! Silakan coba lagi.'
+            ]);
+        }
     }
 }

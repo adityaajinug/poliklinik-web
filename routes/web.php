@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DokterController;
 use App\Http\Controllers\PasienController;
+use App\Http\Controllers\PeriksaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,18 @@ Route::middleware('auth')->group(function () {
     Route::controller(DokterController::class)
         ->as('dokter.')
         ->prefix('dokter')
+        ->group(function () {
+            Route::get('/', 'index')->name('index'); 
+            Route::get('/create', 'create')->name('create');
+            Route::post('/store', 'store')->name('store'); 
+            Route::get('/edit/{id}', 'edit')->name('edit'); 
+            Route::put('/update/{id}', 'update')->name('update'); 
+            Route::delete('/destroy/{id}', 'destroy')->name('destroy'); 
+        });
+
+    Route::controller(PeriksaController::class)
+        ->as('periksa.')
+        ->prefix('periksa')
         ->group(function () {
             Route::get('/', 'index')->name('index'); 
             Route::get('/create', 'create')->name('create');

@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Periksa extends Model
 {
     use HasFactory;
-    protected $timestamps = false;
+    public $timestamps = false;
     protected $fillable = [
         'id_pasien',
         'id_dokter',
+        'tgl_periksa',
+        'catatan',
+        'obat',
     ];
 
     public function pasien()
