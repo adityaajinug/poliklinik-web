@@ -25,7 +25,8 @@ class PeriksaController extends Controller
         return view('periksa.form', [
             'pasiens' => $pasiens,
             'dokters' => $dokters,
-            'action' => 'store'
+            'action' => 'store',
+            'data' => null
         ]);
     }
 
@@ -70,7 +71,7 @@ class PeriksaController extends Controller
         $dokters = Dokter::all();
 
         return view('periksa.form', [
-            'periksa' => $periksa,
+            'data' => $periksa,
             'pasiens' => $pasiens,
             'dokters' => $dokters,
             'action' => 'update'

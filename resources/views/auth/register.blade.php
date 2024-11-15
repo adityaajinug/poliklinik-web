@@ -4,6 +4,8 @@
         {{ session('message') }}
     </div>
     @endif
+
+    <h2 class="text-center text-2xl font-semibold mb-3">{{ __('Register') }}</h2>
     <form method="POST" action="{{ route('register.store') }}">
         @csrf
 

@@ -93,7 +93,7 @@
                         <!-- Tombol dan Status -->
                         <div class="flex items-center gap-4">
                             <x-primary-button>
-                                {{ $action === 'store' ? __('Simpan') : __('Perbarui') }}
+                                {{ $action === 'store' ? __('Simpan') : __('Update') }}
                             </x-primary-button>
 
                             @if (session('status'))
